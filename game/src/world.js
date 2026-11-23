@@ -21,6 +21,7 @@ export function newGame(rng) {
     log: ['Two lanterns. One table. Keep yours lit.'],
     played: [], // cards shown face-up in the middle this turn
     anim: [],   // {card, from, t} simple slide/flip animations
+    floaters: [], // {text, side, t, color} rising damage/heal numbers over a lantern
     winner: null,
   };
   state.player.deck = buildDeck(rng);
@@ -62,13 +63,17 @@ export function playCard(state, who, card) {
     const blocked = Math.min(foe.shield, dmg);
     foe.shield -= blocked;
     foe.hp -= dmg - blocked;
+    state.floaters.push({ text: `-${dmg - blocked}`, side: who === 'player' ? 'keeper' : 'player', t: 0, color: '#ff8a7a' });
+    if (blocked) state.floaters.push({ text: `🛡${blocked}`, side: who === 'player' ? 'keeper' : 'player', t: 0.15, color: '#9fd0ff' });
     state.log.push(`${me.name} plays ${card.name}: ${dmg} damage${blocked ? ` (${blocked} warded)` : ''}.`);
   } else if (card.kind === 'mend') {
     me.hp = Math.min(START_HP, me.hp + card.power);
+    state.floaters.push({ text: `+${card.power}`, side: who, t: 0, color: '#9fe8a8' });
     state.log.push(`${me.name} plays ${card.name}: +${card.power} light.`);
   } else if (card.kind === 'ward') {
     me.shield += card.power;
     me.lastWardElement = card.element;
+    state.floaters.push({ text: `🛡+${card.power}`, side: who, t: 0, color: '#9fd0ff' });
     state.log.push(`${me.name} plays ${card.name}: +${card.power} shield.`);
   } else if (card.kind === 'draw') {
     draw(me, card.power);

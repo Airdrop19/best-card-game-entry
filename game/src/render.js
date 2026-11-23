@@ -110,8 +110,12 @@ export function render(ctx, state, hover) {
     ctx.fillText('A card duel of light and ember', W / 2, 300);
     lantern(ctx, W / 2 - 160, 430, START_HP, 'You', 0);
     lantern(ctx, W / 2 + 160, 430, START_HP, 'The Keeper', 0);
-    ctx.font = '21px Georgia, serif'; ctx.fillStyle = '#cfc6e8';
-    ctx.fillText('Click a card to play it · Enter ends your turn · Snuff the Keeper’s lantern', W / 2, 580);
+    // How to play
+    ctx.font = '20px Georgia, serif'; ctx.fillStyle = '#cfc6e8';
+    ctx.fillText('Spend ember to play cards: strike to damage, mend to heal, ward to shield, draw for more cards.', W / 2, 545);
+    ctx.fillText('Element wheel: Flame ▲ beats Leaf ◆ · Leaf beats Spark ★ · Spark beats Tide ● · Tide beats Flame — a winning strike deals +2.', W / 2, 578);
+    ctx.font = '21px Georgia, serif';
+    ctx.fillText('Click a card to play it · Enter ends your turn · Snuff the Keeper’s lantern', W / 2, 618);
     ctx.font = 'bold 30px Georgia, serif'; ctx.fillStyle = '#ffd166';
     ctx.fillText('Click or press Enter to begin', W / 2, 650);
     return;
@@ -122,6 +126,18 @@ export function render(ctx, state, hover) {
   k.hand.forEach((c, i) => drawCard(ctx, c, W / 2 - (k.hand.length * 92) / 2 + i * 92, 84, { faceDown: true }));
   lantern(ctx, 150, 190, k.hp, 'The Keeper', k.shield);
   lantern(ctx, 150, 560, p.hp, 'You', p.shield);
+  // Deck / discard counts
+  ctx.fillStyle = 'rgba(247,241,227,.75)'; ctx.font = '15px Georgia, serif'; ctx.textAlign = 'center';
+  ctx.fillText(`deck ${k.deck.length} · discard ${k.discard.length}`, 150, 322);
+  ctx.fillText(`deck ${p.deck.length} · discard ${p.discard.length}`, 150, 692);
+  // Floating damage / heal numbers over the lanterns
+  for (const f of state.floaters || []) {
+    const yBase = f.side === 'keeper' ? 150 : 520;
+    ctx.globalAlpha = Math.max(0, 1 - f.t / 1.4);
+    ctx.fillStyle = f.color; ctx.font = 'bold 34px Georgia, serif'; ctx.textAlign = 'center';
+    ctx.fillText(f.text, 150, yBase - f.t * 46);
+    ctx.globalAlpha = 1;
+  }
   energyPips(ctx, 96, 700, p.energy, 6);
   ctx.fillStyle = '#f7f1e3'; ctx.font = '15px Georgia, serif'; ctx.textAlign = 'left';
   ctx.fillText('ember', 96, 726);

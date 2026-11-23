@@ -78,6 +78,8 @@ if (shot) {
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     state.anim.forEach((a) => { a.t = Math.min(1, a.t + dt * 2.2); });
+    state.floaters.forEach((f) => { f.t += dt; });
+    state.floaters = state.floaters.filter((f) => f.t < 1.4);
     keeperStep(dt);
     render(ctx, state, hover);
     requestAnimationFrame(loop);
